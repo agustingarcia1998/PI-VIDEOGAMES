@@ -9,7 +9,7 @@ const initialState = {
 function rootReducer (state = initialState, action){
     switch(action.type) {
         case 'GET_VIDEOGAMES' :
-            return{
+            return {
                 ...state,
                 videogames: action.payload,
                copyVideogames: action.payload
@@ -40,7 +40,7 @@ function rootReducer (state = initialState, action){
                     videogames: sortedArr
                 }
             
-        case "FILTER_BY_GENRES":
+        case 'FILTER_BY_GENRES':
             let genre = action.payload === "all" ? state.copyVideogames : state.copyVideogames.filter((el) => el.genres.includes(action.payload))
                              
              return {
@@ -48,13 +48,13 @@ function rootReducer (state = initialState, action){
                 videogames: genre,
             }
 
-        case "GET_GENRES":
-            return{
+        case 'GET_GENRES':
+            return {
                 ...state,
                 genres: action.payload
             }
 
-        case "SORT_RATING":
+        case 'SORT_RATING':
             let sortRating = action.payload === 'Asc' ?
             [...state.videogames].sort(function (a, b) {
                     return (a.rating - b.rating);
@@ -67,8 +67,12 @@ function rootReducer (state = initialState, action){
                 videogames: sortRating
             }
 
-        case "CREATION_FILTER":
-            const filterCrea = action.payload
+        case "GET_NAME_VIDEOGAMES":
+            return {
+                ...state,
+                videogames: action.payload
+            }
+
                                  
                 
 
@@ -77,5 +81,7 @@ function rootReducer (state = initialState, action){
     }
         
 }
+
+        
 
 export default rootReducer;

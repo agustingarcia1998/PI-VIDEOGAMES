@@ -5,12 +5,12 @@ import { getVideogames, getGenres , filterByGenre, orderByName, sortRating  } fr
 import { Link } from 'react-router-dom'
 import Card from "./Card";
 import Paginado from "./Paginado";
-
+import SearchBar from "./SearchBar";
 
 export default function Home (){
 
     const dispatch = useDispatch()
-    const allVideoGames = useSelector((state) => state.videogames)
+    const allVideogames = useSelector((state) => state.videogames)
     const genres = useSelector((state) => state.genres)//equivale al mapStateToProps
     
 
@@ -18,17 +18,17 @@ export default function Home (){
     const [orden, setOrden] = useState('');
     const [currentPage, setCurrentPage] = useState(1);//pagina inicial
     const [videogamesPerPage, setvideogamesPerPage] = useState(15);//juegos por pagina
-    const indexOfLastVideoGame = currentPage * videogamesPerPage; // 15
-    const indexOfFirstVideoGame = indexOfLastVideoGame - videogamesPerPage; //0
-    const currentVideoGames = allVideoGames.slice(indexOfFirstVideoGame, indexOfLastVideoGame);
+    const indexOfLastVideogame = currentPage * videogamesPerPage; // 15
+    const indexOfFirstVideogame = indexOfLastVideogame - videogamesPerPage; //0
+    const currentVideogames = allVideogames.slice(indexOfFirstVideogame, indexOfLastVideogame);
 
 
-    const paginado = (pageNumber) => {
-        setCurrentPage(pageNumber)
+    const paginado = (pageNumber) => {//pasamos num de pagina
+        setCurrentPage(pageNumber)//lo cambiamos
     };
 
     
-    // console.log(allVideoGames)
+    // console.log(allVideogames)
     useEffect (() => {
         dispatch(getVideogames());
         dispatch(getGenres())
@@ -93,12 +93,15 @@ export default function Home (){
         <div>
           <Paginado
           videogamesPerPage = {videogamesPerPage}
-          allVideoGames = {allVideoGames.length}
+          allVideogames = {allVideogames.length}
           paginado = {paginado}
           />
+          <SearchBar/>
           </div>
+
+          
         
-        {currentVideoGames?.map(g => {
+        {currentVideogames?.map(g => {
             return ( 
                 <div>
                 <Link to={"/home/" + g.id}>
