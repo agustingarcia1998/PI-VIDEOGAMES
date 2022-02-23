@@ -4,6 +4,8 @@ const initialState = {
     genres : [], 
     copyVideogames : [],
     rating : [],
+    platforms : [],
+    details : []
 }
 
 function rootReducer (state = initialState, action){
@@ -73,6 +75,24 @@ function rootReducer (state = initialState, action){
                 videogames: action.payload
             }
 
+        case "POST_VIDEOGAME":
+            return{
+                ...state,
+            }
+
+        case "GET_PLATFORMS":
+            const platform = action.payload.map(g => g.platforms).flat()
+            const platformMap = [...new Set(platform)]
+            return{       
+                ...state,   
+                platforms: platformMap
+            }
+
+        case "GET_DETAILS":
+            return{
+                ...state,
+                details: action.payload
+            }
                                  
                 
 

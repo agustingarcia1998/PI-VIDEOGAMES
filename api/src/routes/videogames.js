@@ -19,7 +19,9 @@ router.get('/', async(req, res) => {
                     name: g.name,
                     img: g.background_image,
                     rating: g.rating,
-                    genres: g.genres.map(g => g.name)
+                    genres: g.genres.map(g => g.name),
+                    description: g.description,
+                    platforms: g.platforms.map(p => p.platform.name),
                 }
            });
 
@@ -27,7 +29,14 @@ router.get('/', async(req, res) => {
 
             const gamesDb = await Videogame.findAll({
                 where: { name: name.toLowerCase() },
-                include: Genre
+                attributes: ["id", "name", "img", "rating", "description", "platforms"],
+                include: {
+                    model: Genre,
+                    attributes: ["name"],
+                    through: {
+                        attributes: []
+                    }
+                }
             })
           
             const allGames = gamesDb.concat(allGamesApi).slice(0, 15) 
@@ -42,7 +51,7 @@ router.get('/', async(req, res) => {
     else{
         // busco todos los de mi db 
         const allGamesDb = await Videogame.findAll({
-            attributes: ["name", "img", "rating"],
+            attributes: ["name", "img", "rating", "platforms", "createdDb"],
             include:{
                 model: Genre,
                 attributes: ["name"],
@@ -67,7 +76,8 @@ router.get('/', async(req, res) => {
                         img: g.background_image,
                         name: g.name,
                         rating: g.rating,
-                        genres: g.genres.map(g => g.name)
+                        genres: g.genres.map(g => g.name),
+                        platforms: g.platforms.map(p => p.platform.name) // accedo al array platformS, luego a cada platform y me traigo solo su nombre 
                     }
                 })
 
@@ -114,28 +124,40 @@ router.get('/:id', async (req, res) => {
 
 router.post("/", async (req,res) => {
    
-    // platforms = platforms.join(', ')
 
     try {
 
-        const {name, description, releaseDate, rating, genres, platforms} = req.body;
+        let {name, description, releaseDate, rating, genres, platforms, createdDb, img} = req.body;
+        platforms= platforms.join(", ")
 
-        const newGame = await Videogame.findOrCreate({ 
-            
+        const [newGame, created] = await Videogame.findOrCreate({ 
             where: {
                 name,
                 description,
                 releaseDate,
                 rating,
                 platforms,
+                createdDb: true,
+                img
+            }
+        })
+        
+        // await newGame[0].addGenres(genres);
+        let genreVG = await Genre.findAll({
+            where: {
+                name: genres
             }
         })
 
-        await newGame[0].addGenres(genres);
+        // console.log(genreVG)
+
+        await newGame.setGenres(genreVG)
+        console.log(newGame)
+
         res.status(201).send("message: Tu juego fue creado")
 
     } catch (error) {
-        res.status(404).send("No se pudo crear tu juego" + error)
+        console.log("No se pudo crear tu juego" + error)
     }
 })
 

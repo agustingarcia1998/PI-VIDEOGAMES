@@ -65,20 +65,20 @@ export default function Home (){
   
     return ( 
         <div>
-            <Link to='/videogame'> Crear juego </Link>
+            <Link to='/videogame'> ¡Create Game!</Link>
             <h1> Videogames </h1>
             <button onClick={e => {handleClick(e)}}>
-            Todos los juegos
+            All Games
             </button>
         <div>
             <select onChange={e => handleSort(e)}>
-                <option>Orden alfabético</option>
+                <option>Alphabetical Order</option>
                 <option value='Asc'> A-Z Videogames </option>
                 <option value='Desc'> Z-A Videogames </option>
             </select>
                 <div className="orden-container"/>
                 <select onChange={(e) => handleFilterByGenre(e)}>
-                    {<option value="all"> Todos los generos </option>}
+                    {<option value="all"> All Genres </option>}
                     {genres?.map((genres) => {
                         return (
                             <option key={genres.name} value={genres.name}>{genres.name}</option>
@@ -105,7 +105,7 @@ export default function Home (){
             return ( 
                 <div>
                 <Link to={"/home/" + g.id}>
-               <Card name={g.name} img={g.img} genres={g.genres} key={g.id} rating={g.rating}/>
+               <Card name={g.name} id={g.id} img={g.img} genres={g.genres} key={g.id} rating={g.rating} platforms={g.platforms}/>
                </Link>
                </div>
             );

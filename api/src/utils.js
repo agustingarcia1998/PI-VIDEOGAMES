@@ -16,6 +16,7 @@ function traerJuegoDB(value) {
 
 async function traerJuegosApi  (value) {
     const urlApi = await axios.get(`https://api.rawg.io/api/games/${value}?key=${apikey}&page_size=100`)//revisar tamaño de pagina
+    
 
     const infoJuegoApi = {
         id: urlApi.data.id,
@@ -23,7 +24,7 @@ async function traerJuegosApi  (value) {
         description: urlApi.data.description,
         releaseDate: urlApi.data.releaseDate,
         rating: urlApi.data.rating,
-        // platform: urlApi.data.platform, revisar
+        platforms: (urlApi.data.platforms).map(p => p.platform.name)
     }
     return infoJuegoApi
 }
