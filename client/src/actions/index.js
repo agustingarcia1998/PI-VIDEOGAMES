@@ -31,6 +31,13 @@ export function filterByGenre(payload){
 
 }
 
+export function filterByCreated(payload){
+    return {
+        type: "FILTER_BY_CREATED",
+        payload
+    }
+}
+
 
 export function orderByName(payload){
     return {

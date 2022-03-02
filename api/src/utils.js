@@ -1,10 +1,13 @@
 const axios = require ('axios');
 require('dotenv').config();
 const { apikey } = require ('./db');
-function traerJuegoDB(value) {
+
+
+function getGamesDb(value) {
     const infoJuegoDB = {
         id: value.id,
         name: value.name,
+        img: value.img,
         description: value.description,
         releaseDate: value.releaseDate,
         rating: value.rating,
@@ -14,17 +17,21 @@ function traerJuegoDB(value) {
 }
     
 
-async function traerJuegosApi  (value) {
-    const urlApi = await axios.get(`https://api.rawg.io/api/games/${value}?key=${apikey}&page_size=100`)//revisar tamaño de pagina
+async function getGamesApi  (value) {
+    const urlApi = await axios.get(`https://api.rawg.io/api/games/${value}?key=${apikey}&page_size=100`);
+    let platforms2 = (urlApi.data.platforms).map(p => p.platform.name)
+    platforms2 = platforms2.join(', ')
     
-
     const infoJuegoApi = {
         id: urlApi.data.id,
         name: urlApi.data.name,
+        img: urlApi.data.background_image,
         description: urlApi.data.description,
-        releaseDate: urlApi.data.releaseDate,
+        genres: (urlApi.data.genres).map(g => g.name),
+        releaseDate: urlApi.data.released,
         rating: urlApi.data.rating,
-        platforms: (urlApi.data.platforms).map(p => p.platform.name)
+        platforms: platforms2, 
+        
     }
     return infoJuegoApi
 }
@@ -32,16 +39,7 @@ async function traerJuegosApi  (value) {
 
 
 
-
-
-
-
-
-
-
-
-
 module.exports = {
-    traerJuegoDB,
-    traerJuegosApi,
+    getGamesDb,
+    getGamesApi,
 }

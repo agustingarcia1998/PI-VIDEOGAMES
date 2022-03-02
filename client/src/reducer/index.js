@@ -5,7 +5,8 @@ const initialState = {
     copyVideogames : [],
     rating : [],
     platforms : [],
-    details : []
+    details : [],
+    videogamesRender: []
 }
 
 function rootReducer (state = initialState, action){
@@ -14,11 +15,12 @@ function rootReducer (state = initialState, action){
             return {
                 ...state,
                 videogames: action.payload,
-               copyVideogames: action.payload
+               copyVideogames: action.payload,
+               videogamesRender: action.payload
             }
 
         case 'ORDER_BY_NAME':
-            let sortedArr = action.payload === 'Asc' ?
+            let orderName = action.payload === 'Desc' ?
                 state.videogames.sort(function (a, b) {
                     if(a.name > b.name) {
                         return 1;
@@ -36,10 +38,11 @@ function rootReducer (state = initialState, action){
                         return 1;
                     }
                     
+                    return 0;
                 })
                 return {
                     ...state, 
-                    videogames: sortedArr
+                    videogames: orderName
                 }
             
         case 'FILTER_BY_GENRES':
@@ -48,6 +51,14 @@ function rootReducer (state = initialState, action){
              return {
                  ...state,
                 videogames: genre,
+            }
+
+        case 'FILTER_BY_CREATED':
+            let filterGames = action.payload === "All" ? state.copyVideogames : action.payload === "Created" ? state.copyVideogames.filter(g => g.createdDb) : state.copyVideogames.filter(g => !g.createdDb)
+
+            return{
+                ...state,
+                videogames: filterGames
             }
 
         case 'GET_GENRES':
@@ -64,10 +75,12 @@ function rootReducer (state = initialState, action){
               [...state.videogames].sort(function(a, b){
                   return (b.rating - a.rating)
               })
+              
             return {
                 ...state, 
                 videogames: sortRating
             }
+
 
         case "GET_NAME_VIDEOGAMES":
             return {
@@ -81,8 +94,8 @@ function rootReducer (state = initialState, action){
             }
 
         case "GET_PLATFORMS":
-            const platform = action.payload.map(g => g.platforms).flat()
-            const platformMap = [...new Set(platform)]
+            const platform = action.payload.map(g => g.platforms).flat()//concateno
+            const platformMap = [...new Set(platform)]//guardo los nuevos value
             return{       
                 ...state,   
                 platforms: platformMap

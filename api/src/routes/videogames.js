@@ -2,16 +2,18 @@ require('dotenv').config();
 const { apikey, Videogame, Genre } = require ('../db');
 const { Router } = require('express');
 const axios = require('axios');
-const router = Router()
-const {  traerJuegoDB, traerJuegosApi } = require ('../utils');
+const router = Router();
+const {  getGamesApi } = require ('../utils');
 
 
 router.get('/', async(req, res) => {
 
-    const { name } = req.query;
+    let { name } = req.query;
+    
 
     if(name){
         try {
+            name = name.charAt(0).toUpperCase() + name.slice(1);
             let urlBusqueda = await axios.get(`https://api.rawg.io/api/games?search=${name}&key=${apikey}`);
              const allGamesApi = urlBusqueda.data.results.map(g => {
                 return{
@@ -25,10 +27,10 @@ router.get('/', async(req, res) => {
                 }
            });
 
-            if(!allGamesApi) return res.status(204).send("No se encontro el juego" + name)
+            if(!allGamesApi) return res.status(404).send("Game not found" + name)
 
             const gamesDb = await Videogame.findAll({
-                where: { name: name.toLowerCase() },
+                where: { name: name },
                 attributes: ["id", "name", "img", "rating", "description", "platforms"],
                 include: {
                     model: Genre,
@@ -45,13 +47,13 @@ router.get('/', async(req, res) => {
              
            
         } catch (error) {
-            console.log(error); // PREGUNTAR POR QUÉ NO ANDA ????????
+            console.log(error);
         }
     } 
-    else{
+    else{//no hay name  recibido por query
         // busco todos los de mi db 
         const allGamesDb = await Videogame.findAll({
-            attributes: ["name", "img", "rating", "platforms", "createdDb"],
+            attributes: ["id", "name", "img", "rating", "platforms", "createdDb"],
             include:{
                 model: Genre,
                 attributes: ["name"],
@@ -74,14 +76,14 @@ router.get('/', async(req, res) => {
                     return {
                         id: g.id,
                         img: g.background_image,
-                        name: g.name,
+                        name: (g.name),
                         rating: g.rating,
                         genres: g.genres.map(g => g.name),
                         platforms: g.platforms.map(p => p.platform.name) // accedo al array platformS, luego a cada platform y me traigo solo su nombre 
                     }
                 })
 
-                results = [...results, ...infoVideoGames]
+                results = [...results, ...infoVideoGames]// guardo lo que ya habia mas lo de info
                 urlApi = await axios.get(urlApi.data.next)
             }
             return res.send(results)
@@ -98,41 +100,57 @@ router.get('/', async(req, res) => {
 
 router.get('/:id', async (req, res) => {
     const { id } = req.params;
-    if(id.includes('-')){
+    if(id.includes('-')){//db
        try {
-        const gameDb = await Videogame.findOne({
-            where: { id },
-            include: Genre
-        })
-        const gameSearchDb = traerJuegoDB(gameDb)
-        res.send(gameSearchDb)   
+        const gameDb = await Videogame.findByPk(
+            id,
+            {include: Genre})
+            const myGameDb = {
+                id: gameDb.id,
+                name: gameDb.name,
+                img: gameDb.img,
+                description: gameDb.description,
+                releaseDate: gameDb.releaseDate,
+                rating: gameDb.rating,
+                platforms: gameDb.platforms,
+                genres: gameDb.genres.map(g => g.name)
+            }
+
+            if(myGameDb){
+                return res.send(myGameDb)
+            }
+        
+        
        } catch (error) {
-           res.status(404).send('no se encuentra juego por id' + error)
+           res.status(404).send('Game not found by id' + error)
        }
         
     }else{
         try {
-            const gameApi = await traerJuegosApi(id)
+            const gameApi = await getGamesApi(id)
             res.send(gameApi);
         } catch (error) {
-            res.status(404).send('no se encuentra juego por id' + error)
+            res.status(404).send('Game not found by id' + error)
         }
        
     }
 })
         
 
-router.post("/", async (req,res) => {
-   
+router.post("/", async (req, res) => {
 
     try {
 
         let {name, description, releaseDate, rating, genres, platforms, createdDb, img} = req.body;
-        platforms= platforms.join(", ")
-
+        platforms = platforms.join(", ")
+        name = name.charAt(0).toUpperCase() + name.slice(1)
+        if(!img.length) {
+            img = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRvRvZqBmoaDOK5dmTAV1t8FuWpjHnQ4LzlVg&usqp=CAU"
+        }
+        
         const [newGame, created] = await Videogame.findOrCreate({ 
             where: {
-                name,
+                name,//rec por body
                 description,
                 releaseDate,
                 rating,
@@ -142,22 +160,24 @@ router.post("/", async (req,res) => {
             }
         })
         
-        // await newGame[0].addGenres(genres);
+        if(!created){
+            return res.status(400).json("This game already exists")
+        }
+       
         let genreVG = await Genre.findAll({
             where: {
                 name: genres
             }
         })
 
-        // console.log(genreVG)
 
         await newGame.setGenres(genreVG)
         console.log(newGame)
 
-        res.status(201).send("message: Tu juego fue creado")
+        res.status(201).send("message: Your game was created")
 
     } catch (error) {
-        console.log("No se pudo crear tu juego" + error)
+        console.log("Your game can not be created" + error)
     }
 })
 

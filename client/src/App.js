@@ -1,20 +1,20 @@
 import './App.css';
-import { BrowserRouter, Route } from 'react-router-dom';
-import LandingPage from './components/LandingPage';
-import Home from './components/Home';
-import CreateGame from './components/CreateGame';
-import GameDetail from "./components/GameDetail"
+import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import LandingPage from './components/LandingPage/LandingPage';
+import Home from './components/Home/Home';
+import CreateGame from './components/CreateGame/CreateGame.jsx';
+import GameDetail from "./components/GameDetail/GameDetail.jsx"
 
 function App() {
   return (
     <BrowserRouter>
     <div className="App">
-  
-        <Route exact path= '/' component= {LandingPage} />
-        <Route path= '/home' component= {Home} />
-        <Route path= '/videogame' component= {CreateGame} />
-        <Route path= '/home/:id' component= {GameDetail} />
-
+       <Routes>
+       <Route exact path= '/' element= {<LandingPage/>} />
+        <Route path= '/home' element= {<Home/>} />
+        <Route path= '/videogame' element= {<CreateGame/>} />
+        <Route path= '/home/:id' element= {<GameDetail/>} />
+       </Routes>
     </div>
     </BrowserRouter>
   );

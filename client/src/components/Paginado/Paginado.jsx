@@ -1,4 +1,5 @@
 import React from "react";
+import { Div } from "./Styled";
 
 export default function Paginado ({videogamesPerPage, allVideogames, paginado}){
     const pageNumber = []//empieza como arr vacio
@@ -8,16 +9,18 @@ export default function Paginado ({videogamesPerPage, allVideogames, paginado}){
     }
 
     return(
-        <nav>
-            <ul className="paginado">
+        <Div>
+        <div>
+            <div className="paginado">
                 { 
                 pageNumber?.map(number =>{//si el array tiene algo...
                     return( 
-                    <li className="number" key={number}>
-                    <button onClick={() => paginado(number)}>{number}</button>
-                    </li>
+                    <ul className="number" key={number}>
+                    <button className="contnumbers" onClick={() => paginado(number)}>{number}</button>
+                    </ul>
                 )})}
-            </ul>
-        </nav>
+            </div>
+        </div>
+        </Div>
     )
 }

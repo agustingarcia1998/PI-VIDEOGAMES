@@ -15,8 +15,23 @@ describe('Videogame model', () => {
           .catch(() => done());
       });
       it('should work when its a valid name', () => {
-        Recipe.create({ name: 'Super Mario Bros' });
+        Videogame.create({ name: 'Super Mario Bros' });
       });
     });
   });
+  
+  describe('Dates', () => {
+    it('should throw an error if  rating is not a number', (done) =>{
+      Videogame.create({name: 'actionman', rating: "hola", platforms: "PC", genres: "action"})
+        .then(() => done(new Error ('Rating should be a number')))
+        .catch(() => done())
+    })
+    
+    it('should throw an error if  platforms is not a string', (done) =>{
+      Videogame.create({name: 'actionman', rating: 2, platforms: ["PC"], genres: "action"})
+        .then(() => done(new Error ('Platforms should be a string')))
+        .catch(() => done())
+    })
+  })
 });
+
