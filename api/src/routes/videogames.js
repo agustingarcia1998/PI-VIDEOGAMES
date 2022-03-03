@@ -150,7 +150,7 @@ router.post("/", async (req, res) => {
         
         const [newGame, created] = await Videogame.findOrCreate({ 
             where: {
-                name,//rec por body
+                name,//igual a las rec por body
                 description,
                 releaseDate,
                 rating,
@@ -160,7 +160,7 @@ router.post("/", async (req, res) => {
             }
         })
         
-        if(!created){
+        if(!created){//si lo encuentra
             return res.status(400).json("This game already exists")
         }
        

@@ -3,19 +3,6 @@ require('dotenv').config();
 const { apikey } = require ('./db');
 
 
-function getGamesDb(value) {
-    const infoJuegoDB = {
-        id: value.id,
-        name: value.name,
-        img: value.img,
-        description: value.description,
-        releaseDate: value.releaseDate,
-        rating: value.rating,
-        // platform: value.platform
-    }
-    return infoJuegoDB
-}
-    
 
 async function getGamesApi  (value) {
     const urlApi = await axios.get(`https://api.rawg.io/api/games/${value}?key=${apikey}&page_size=100`);
@@ -36,10 +23,10 @@ async function getGamesApi  (value) {
     return infoJuegoApi
 }
 
+    
 
 
 
 module.exports = {
-    getGamesDb,
     getGamesApi,
 }
